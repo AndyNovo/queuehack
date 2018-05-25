@@ -13,8 +13,15 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      'currentUser': ''
+      'currentUser': '',
+      'users':{}
     };
+    firebase.database().ref(`users`).on('value', snapshot => {
+            this.setState({
+                users: snapshot.val()
+            });
+            userStore.setUsers(snapshot.val());
+        });
   }
 
   componentDidMount() {
@@ -30,7 +37,13 @@ class App extends Component {
                 rando = old;
               }
               userStore.setUserInfo(user.email || `demoUser${rando}@gmail.com`, user.displayName || `Demo User ${rando}`, user.photoURL || '', user.uid || `${rando}`);
-              this.setState({currentUser: user.displayName});
+              this.setState({...this.state, currentUser: user.displayName});
+              console.log('testing');
+              if (!!this.state.users && !this.state.users.hasOwnProperty(user.uid)){
+                  console.log('setting new user');
+                  let newRef = firebase.database().ref(`users`).child(user.uid);
+                  newRef.set({name: user.displayName, email: user.email, photo: user.photoURL});
+              }
           } else {
               userStore.logout();
           }
@@ -45,7 +58,7 @@ class App extends Component {
         <Switch>
           <Route exact path='/' component={UsersPage} user={this.state.currentUser}/>
           <Route path='/login' component={SignInPage}/>
-          <Route path='/user/:uid' component={UserQueue}/>
+          <Route path='/user/:uid' component={UserQueue} users={this.state.users}/>
         </Switch>
       </Router>
       </div>

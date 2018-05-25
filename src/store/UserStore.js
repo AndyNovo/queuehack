@@ -1,4 +1,7 @@
 class UserStore {
+    users = {};
+
+    callbacks = [];
 
     login() {
         //console.log("UserStore login");
@@ -13,6 +16,16 @@ class UserStore {
         this.uid = uid;
     }
 
+    registerCallback(callback){
+      this.callbacks.push(callback);
+    }
+
+    setUsers(usersObj){
+        this.users = usersObj;
+        console.log(usersObj);
+        this.callbacks.map(cb=>{ cb(); });
+    }
+
     logout() {
         //console.log("UserStore logout");
         this.authed = false;
@@ -21,6 +34,7 @@ class UserStore {
         this.photoURL = "";
         this.uid = "";
         this.role = "";
+        this.callbacks.map(cb=>{ cb(); });
     }
 }
 
