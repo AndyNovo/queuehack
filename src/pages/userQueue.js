@@ -11,7 +11,8 @@ export default class UserQueue extends React.Component {
     this.state = {
       uid: props.match.params.uid,
       user: {name: ''},
-      tasks: []
+      tasks: [],
+      showComplete: false
     };
     firebase.database().ref(`queues`).child(props.match.params.uid).child('tasks').on('value', snapshot => {
             let taskArray = [];
@@ -27,6 +28,9 @@ export default class UserQueue extends React.Component {
                 }
             }
             console.log(taskArray);
+            taskArray.sort((a,b)=>{
+              return a.timestamp > b.timestamp;
+            });
             this.setState({
                 tasks: taskArray
             });
@@ -39,9 +43,40 @@ export default class UserQueue extends React.Component {
 
   completeTask(task){
     if (userStore.uid == this.state.uid){
+      console.log('completing');
       firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).child('isComplete').set(true);
+    } else if (userStore.uid == task.fromuser.uid){
+      console.log("deleting");
+      firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).remove();
     } else {
-      console.log("not authorized");
+      console.log('not authorized');
+    }
+  }
+
+  handleChange(){
+    this.setState({showComplete: !this.state.showComplete});
+  }
+
+  pushTask(task){
+    let taskObj = {
+      fromuser: {
+        name: userStore.displayName,
+        uid: userStore.uid
+      },
+      isComplete: false,
+      task,
+      timestamp: Date.now()
+    };
+    let newRef = firebase.database().ref('queues').child(this.state.uid).child('tasks').push();
+    newRef.set(taskObj).then(result=>{
+      this.refs.newTask.value = '';
+    });
+  }
+
+  handleKeyUp(evt){
+    if (evt.key == "Enter"){
+      console.log(this.refs.newTask.value);
+      this.pushTask(this.refs.newTask.value);
     }
   }
 
@@ -50,11 +85,39 @@ export default class UserQueue extends React.Component {
     return (
       <div>
         <h2>{!!this.state.user && <span>{this.state.user.name}</span>} Queue Here</h2>
-        <ul>
-          {this.state.tasks.map(task=>{
-            return (<li key={task.key}>{JSON.stringify(task)} <span onClick={this.completeTask.bind(this, task)}>X</span></li>)
+        {userStore.authed &&
+        <div>
+          <label>
+            Add Task To {this.state.user.name}&apos;s queue
+            <input type="text" onKeyUp={this.handleKeyUp.bind(this)} ref={'newTask'} placeholder={'Add task to queue'}/>
+          </label>
+        </div>}
+        {!userStore.authed &&
+        <div>Login to post tasks to this user</div>
+        }
+        <label>
+          <input
+          type="checkbox"
+          defaultChecked={this.state.showComplete}
+          ref="showComplete"
+          onChange={this.handleChange.bind(this)}/>
+          Show Complete Tasks?
+        </label>
+        <ol>
+          {this.state.tasks.filter(task=>{
+            if (!this.state.showComplete){
+              return !task.isComplete;
+            } else {
+              return task.isComplete;
+            }
+          }).map(task=>{
+            return (<li key={task.key}>
+              <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
+              &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
+              <span onClick={this.completeTask.bind(this, task)}><strong>X</strong></span>
+              </li>)
           })}
-        </ul>
+        </ol>
       </div>
     );
   }

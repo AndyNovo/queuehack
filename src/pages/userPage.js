@@ -36,7 +36,7 @@ export default class UsersPage extends React.Component {
             </div>
           }
           {!this.state.loggedIn &&
-            <a href="/login">Click to login</a>}
+            <h3><a href="/login">Click to login</a></h3>}
           <ul>
           {Object.keys(this.state.users).map(uid=>{
             return (
