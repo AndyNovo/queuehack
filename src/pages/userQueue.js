@@ -1,6 +1,7 @@
 import React from 'react';
 import firebase from 'firebase';
 import userStore from '../store/UserStore';
+import { TaskCard } from './TaskCard.js';
 
 export default class UserQueue extends React.Component {
 
@@ -53,6 +54,18 @@ export default class UserQueue extends React.Component {
     }
   }
 
+  unCompleteTask(task){
+    if (userStore.uid == this.state.uid){
+      console.log('uncompleting');
+      firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).child('isComplete').set(false);
+    } else if (userStore.uid == task.fromuser.uid){
+      console.log("deleting");
+      firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).remove();
+    } else {
+      console.log('not authorized');
+    }
+  }
+
   handleChange(){
     this.setState({showComplete: !this.state.showComplete});
   }
@@ -84,7 +97,7 @@ export default class UserQueue extends React.Component {
 
     return (
       <div>
-        <h2>{!!this.state.user && <span>{this.state.user.name}</span>} Queue Here</h2>
+        <h2>{!!this.state.user && <span>{this.state.user.name}</span>}'s Tasks</h2>
         {userStore.authed &&
         <div>
           <label>
@@ -111,12 +124,24 @@ export default class UserQueue extends React.Component {
               return task.isComplete;
             }
           }).map(task=>{
+            var icon;
+            if (this.state.showComplete){
+              if (userStore.uid == this.state.uid) {
+                icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
+              }
             return (<li key={task.key}>
               <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
               &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
-              <span onClick={this.completeTask.bind(this, task)}><strong>X</strong></span>
+              {icon}
               </li>)
-          })}
+          } else {
+            if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
+              icon = <span onClick={this.completeTask.bind(this, task)}><strong>X</strong></span>;
+            }
+            return (
+              <TaskCard fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+            );
+          }})}
         </ol>
       </div>
     );

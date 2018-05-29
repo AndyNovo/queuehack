@@ -32,6 +32,7 @@ export default class UsersPage extends React.Component {
           {this.state.loggedIn &&
             <div>
               <h2>Welcome {userStore.displayName}</h2>
+              <a href={"/user/" + userStore.uid}> Go to my queue</a>
               <h3 onClick={this.logout}>Click Here To Logout</h3>
             </div>
           }

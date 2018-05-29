@@ -1,0 +1,10 @@
+.container {
+    background-color: #ededed;
+    color: black;
+    border: solid;
+    border-width: 1px;
+    border-radius: 10px;
+    padding: 10px;
+    display: inline-block;
+    margin-top: 20px;
+}
