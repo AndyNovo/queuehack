@@ -2,6 +2,9 @@ import React from 'react';
 import firebase from 'firebase';
 import userStore from '../store/UserStore';
 import { TaskCard } from './TaskCard.js';
+import logo from '../logo.png';
+import '../App.css';
+import { Tab, Tabs } from 'react-bootstrap';
 
 export default class UserQueue extends React.Component {
 
@@ -96,8 +99,12 @@ export default class UserQueue extends React.Component {
   render() {
 
     return (
-      <div>
-        <h2>{!!this.state.user && <span>{this.state.user.name}</span>}'s Tasks</h2>
+      <div className="App">
+          <header className="App-header">
+              <img src={logo} className="App-logo" alt="logo" />
+              <div className="App-title">{!!this.state.user && <span>{this.state.user.name}</span>}'s Tasks</div>
+          </header>
+          <div>
         {userStore.authed &&
         <div>
           <label>
@@ -108,41 +115,64 @@ export default class UserQueue extends React.Component {
         {!userStore.authed &&
         <div>Login to post tasks to this user</div>
         }
-        <label>
-          <input
-          type="checkbox"
-          defaultChecked={this.state.showComplete}
-          ref="showComplete"
-          onChange={this.handleChange.bind(this)}/>
-          Show Complete Tasks?
-        </label>
-        <ol>
-          {this.state.tasks.filter(task=>{
-            if (!this.state.showComplete){
-              return !task.isComplete;
+        <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
+          <Tab eventKey={1} title="Pending">
+            {this.state.tasks.filter(task=>{
+                return !task.isComplete;
+            }).map(task=>{
+              var icon;
+              if (this.state.showComplete){
+                if (userStore.uid == this.state.uid) {
+                  icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
+                }
+              return (<li key={task.key}>
+                <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
+                &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
+                {icon}
+                </li>)
             } else {
-              return task.isComplete;
-            }
-          }).map(task=>{
-            var icon;
-            if (this.state.showComplete){
-              if (userStore.uid == this.state.uid) {
-                icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
+              if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
+                return (
+                  <TaskCard completeMethod={this.completeTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                );
               }
-            return (<li key={task.key}>
-              <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
-              &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
-              {icon}
-              </li>)
-          } else {
-            if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
-              icon = <span onClick={this.completeTask.bind(this, task)}><strong>X</strong></span>;
-            }
-            return (
-              <TaskCard fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
-            );
-          }})}
-        </ol>
+              else {
+                return (
+                  <TaskCard completeMethod={false} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                );
+              }
+            }})}
+          </Tab>
+          <Tab eventKey={2} title="Complete">
+            {this.state.tasks.filter(task=>{
+                return task.isComplete;
+            }).map(task=>{
+              var icon;
+              if (this.state.showComplete){
+                if (userStore.uid == this.state.uid) {
+                  icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
+                }
+              return (<li key={task.key}>
+                <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
+                &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
+                {icon}
+                </li>)
+            } else {
+              if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
+                return (
+                  <TaskCard completeMethod={this.completeTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                );
+              }
+              else {
+                return (
+                  <TaskCard completeMethod={false} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                );
+              }
+            }})}
+          </Tab>
+        </Tabs>
+        <br></br>
+      </div>
       </div>
     );
   }

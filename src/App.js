@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import firebase from 'firebase';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import logo from './logo.svg';
+import logo from './logo.png';
 import userStore from './store/UserStore';
 import UsersPage from './pages/userPage';
 import SignInPage from './pages/signInPage';
