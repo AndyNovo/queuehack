@@ -16,9 +16,21 @@ export class TaskCard extends React.Component {
   render() {
       if (!this.props.completeMethod) {
         return (
-            <div className="container">
-                <p> <strong style={{ textDecoration: 'underline'}}>{this.props.fromUser}</strong> <strong>|{this.formatDate(this.props.date)}</strong>: {this.props.taskContent}</p>
-            </div>
+            <Panel className="container" bsStyle="warning" defaultExpanded>
+            <Panel.Heading>
+                <Panel.Title>
+                {this.props.fromUser} | {this.formatDate(this.props.date)}
+                <div style={{float: 'right'}}>
+                    <Panel.Toggle style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b'}}>_&nbsp;&nbsp;&nbsp;&nbsp;</Panel.Toggle>
+                </div>
+                </Panel.Title>
+            </Panel.Heading>
+            <Panel.Collapse>
+                <Panel.Body>
+                {this.props.taskContent}
+                </Panel.Body>
+            </Panel.Collapse>
+            </Panel>
         );
       }
       else {
@@ -39,9 +51,6 @@ export class TaskCard extends React.Component {
                 </Panel.Body>
             </Panel.Collapse>
             </Panel>
-        
-
-
         );
       }
   }

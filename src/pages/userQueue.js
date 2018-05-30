@@ -4,7 +4,7 @@ import userStore from '../store/UserStore';
 import { TaskCard } from './TaskCard.js';
 import logo from '../logo.png';
 import '../App.css';
-import { Tab, Tabs } from 'react-bootstrap';
+import { Tab, Tabs, Button } from 'react-bootstrap';
 
 export default class UserQueue extends React.Component {
 
@@ -96,6 +96,10 @@ export default class UserQueue extends React.Component {
     }
   }
 
+  handleButtonClick() {
+    this.pushTask(this.refs.newTask.value);
+  }
+
   render() {
 
     return (
@@ -107,14 +111,15 @@ export default class UserQueue extends React.Component {
           <div>
         {userStore.authed &&
         <div>
-          <label>
-            Add Task To {this.state.user.name}&apos;s queue
-            <input type="text" onKeyUp={this.handleKeyUp.bind(this)} ref={'newTask'} placeholder={'Add task to queue'}/>
+          <label style={{marginTop: '20px', fontSize: '1.25em'}}>
+            <input style={{marginLeft: '10px', marginRight:'10px'}} type="text" onKeyUp={this.handleKeyUp.bind(this)} ref={'newTask'} placeholder={'Add task to queue...'}/>
+            <Button onClick={this.handleButtonClick.bind(this)} style={{fontSize: '1em'}} bsStyle='success'>Submit</Button>
           </label>
         </div>}
         {!userStore.authed &&
         <div>Login to post tasks to this user</div>
         }
+        <p>Hint: You can 'uncomplete' tasks by clicking the 'X' in the completed tab.</p>
         <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
           <Tab eventKey={1} title="Pending">
             {this.state.tasks.filter(task=>{
@@ -152,15 +157,13 @@ export default class UserQueue extends React.Component {
                 if (userStore.uid == this.state.uid) {
                   icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
                 }
-              return (<li key={task.key}>
-                <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
-                &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
-                {icon}
-                </li>)
+              return (
+                <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+              );
             } else {
               if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
                 return (
-                  <TaskCard completeMethod={this.completeTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                  <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
               }
               else {
