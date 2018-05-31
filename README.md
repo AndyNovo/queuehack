@@ -6,7 +6,7 @@ Queuehack is a small 'warmup' project for GEL.  It's in-house task manager/to-do
 ## Installation
 
 ### Clone the repo
-`git clone https://github.com/AndyNovo/queuehack/edit/master/README.md`
+`git clone https://github.com/AndyNovo/queuehack`
 ### Install dependencies
 `cd queuehack && npm install`
 ### Start it up
