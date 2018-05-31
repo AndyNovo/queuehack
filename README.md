@@ -1,5 +1,5 @@
 # QueueHack
-Queuehack is a small 'warmup' project for GEL.  It's in-house task manager/to-do list web app build using a React frontend and a Firebase backend.
+Queuehack is a small 'warmup' project for GEL.  It's in-house task manager/to-do list web app build using a React frontend and a Firebase backend with OAuth .
 
 ![screenshot](https://i.imgur.com/ht1cho7.png "Screenshot")
 
