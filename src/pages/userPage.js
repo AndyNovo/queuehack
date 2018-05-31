@@ -1,6 +1,11 @@
 import React from 'react';
 import firebase from 'firebase';
 import userStore from '../store/UserStore';
+import '../App.css';
+import logo from '../logo.png';
+import { ListGroup, ListGroupItem, Button } from 'react-bootstrap';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+
 
 export default class UsersPage extends React.Component {
 
@@ -12,10 +17,18 @@ export default class UsersPage extends React.Component {
     }
     this.state = {
       loggedIn: logged,
-      users: {}
+      users: {},
+      uid: userStore.uid,
     };
     userStore.registerCallback(this.update.bind(this));
   }
+
+  uiConfig = {
+    signInSuccessUrl: '/',
+    signInOptions: [
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID
+    ]
+  };
 
   logout(){
     firebase.auth().signOut();
@@ -26,26 +39,33 @@ export default class UsersPage extends React.Component {
   }
 
   render() {
-
     return (
-      <div>
+      <div className="App">
+        <header className="App-header">
+          <a href="/"><img src={logo} className="App-logo" alt="logo" /></a>
           {this.state.loggedIn &&
-            <div>
-              <h2>Welcome {userStore.displayName}</h2>
-              <a href={"/user/" + userStore.uid}> Go to my queue</a>
-              <h3 onClick={this.logout}>Click Here To Logout</h3>
-            </div>
-          }
-          {!this.state.loggedIn &&
-            <h3><a href="/login">Click to login</a></h3>}
-          <ul>
-          {Object.keys(this.state.users).map(uid=>{
+              <div>
+                <div className="App-title">Welcome {userStore.displayName}</div>
+              </div>
+            }
+        </header>
+        {!this.state.loggedIn && <div>
+            <p>Please sign-in:</p>
+            <StyledFirebaseAuth uiConfig={this.uiConfig} firebaseAuth={firebase.auth()}/>
+        </div>}
+        {this.state.loggedIn ? <div style={{marginTop: '1em', marginBottom: '1em'}}>
+          <Button bsStyle="primary" style={{display: 'inline-block'}} href={"/user/" + userStore.uid}> Go to my queue</Button>
+          <Button bsStyle="danger" style={{display: 'inline-block', margin: '1em'}} onClick={this.logout}>Logout</Button>
+        </div> : <div></div>}
+        <div style={{fontSize: '1.5em', fontWeight: 'bold'}}>Current Members:</div>
+          <ListGroup style={{display: 'inline-block'}}>
+          {Object.keys(this.state.users).map(uid => {
             return (
-              <li key={uid}><a href={`/user/${uid}`}>{this.state.users[uid].name}</a></li>
+              <ListGroupItem bsStyle="info" style={{fontSize: '1.25em'}} key={uid} href={`/user/${uid}`}>{this.state.users[uid].name}</ListGroupItem>
             );
             })
           }
-          </ul>
+          </ListGroup>
       </div>
     );
   }

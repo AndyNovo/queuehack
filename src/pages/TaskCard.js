@@ -1,12 +1,17 @@
 import React from 'react';
 import '../TaskCard.css';
-import { Button, Glyphicon, Panel } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 
 export class TaskCard extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            expanded: true
         }
+    }
+
+    handleCollapse() {
+        this.setState({expanded: !this.state.expanded});
     }
 
     formatDate(date) {
@@ -16,12 +21,12 @@ export class TaskCard extends React.Component {
   render() {
       if (!this.props.completeMethod) {
         return (
-            <Panel className="container" bsStyle="warning" defaultExpanded>
+            <Panel className="container" bsStyle="warning" expanded={this.state.expanded}>
             <Panel.Heading>
                 <Panel.Title>
                 {this.props.fromUser} | {this.formatDate(this.props.date)}
                 <div style={{float: 'right'}}>
-                    <Panel.Toggle style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b'}}>_&nbsp;&nbsp;&nbsp;&nbsp;</Panel.Toggle>
+                    {this.state.expanded ? <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>↓&nbsp;&nbsp;&nbsp;&nbsp;</div> : <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>+&nbsp;&nbsp;&nbsp;&nbsp;</div>}
                 </div>
                 </Panel.Title>
             </Panel.Heading>
@@ -35,12 +40,12 @@ export class TaskCard extends React.Component {
       }
       else {
         return (
-            <Panel className="container" bsStyle="warning" defaultExpanded>
+            <Panel className="container" bsStyle="warning" expanded={this.state.expanded}>
             <Panel.Heading>
                 <Panel.Title>
                 {this.props.fromUser} | {this.formatDate(this.props.date)}
                 <div style={{float: 'right'}}>
-                    <Panel.Toggle style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b'}}>_&nbsp;&nbsp;&nbsp;&nbsp;</Panel.Toggle>
+                {this.state.expanded ? <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>↓&nbsp;&nbsp;&nbsp;&nbsp;</div> : <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>+&nbsp;&nbsp;&nbsp;&nbsp;</div>}
                     <div onClick={this.props.completeMethod} style={{ display: 'inline-block', cursor: 'pointer'}}>✕</div>
                 </div>
                 </Panel.Title>

@@ -1,7 +1,6 @@
 import React from 'react';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import firebase from 'firebase';
-import userStore from '../store/UserStore';
 
 export default class SignInPage extends React.Component {
 

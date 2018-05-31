@@ -8,6 +8,7 @@
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.0",
     "react-firebaseui": "^3.0.4",
+    "react-pose": "^2.0.0",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.4"
   },

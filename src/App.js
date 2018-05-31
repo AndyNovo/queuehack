@@ -1,11 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import firebase from 'firebase';
-import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import logo from './logo.png';
 import userStore from './store/UserStore';
 import UsersPage from './pages/userPage';
-import SignInPage from './pages/signInPage';
 import UserQueue from './pages/userQueue';
 import './App.css';
 
@@ -36,13 +33,14 @@ class App extends Component {
               } else {
                 rando = old;
               }
-              userStore.setUserInfo(user.email || `demoUser${rando}@gmail.com`, user.displayName || `Demo User ${rando}`, user.photoURL || '', user.uid || `${rando}`);
+
+              userStore.setUserInfo(user.email || `demoUser${rando}@gmail.com`, user.displayName || `Demo User ${rando}`, user.photoURL || '', user.uid || `${rando}` );
               this.setState({...this.state, currentUser: user.displayName});
               console.log('testing');
               if (!!this.state.users && !this.state.users.hasOwnProperty(user.uid)){
                   console.log('setting new user');
                   let newRef = firebase.database().ref(`users`).child(user.uid);
-                  newRef.set({name: user.displayName, email: user.email, photo: user.photoURL});
+                  newRef.set({name: user.displayName, email: user.email, photo: user.photoURL });
               }
           } else {
               userStore.logout();
@@ -57,7 +55,6 @@ class App extends Component {
       <Router>
         <Switch>
           <Route exact path='/' component={UsersPage} user={this.state.currentUser}/>
-          <Route path='/login' component={SignInPage}/>
           <Route path='/user/:uid' component={UserQueue} users={this.state.users}/>
         </Switch>
       </Router>

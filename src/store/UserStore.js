@@ -8,12 +8,13 @@ class UserStore {
         this.authed = true;
     }
 
-    setUserInfo(email, displayName, photoURL, uid) {
+    setUserInfo(email, displayName, photoURL, uid, taskNum) {
        // console.log("UserStore fetchUserInfo");
         this.email = email;
         this.displayName = displayName;
         this.photoURL = photoURL;
         this.uid = uid;
+        this.taskNum = taskNum;
     }
 
     registerCallback(callback){

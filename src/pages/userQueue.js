@@ -4,7 +4,8 @@ import userStore from '../store/UserStore';
 import { TaskCard } from './TaskCard.js';
 import logo from '../logo.png';
 import '../App.css';
-import { Tab, Tabs, Button } from 'react-bootstrap';
+import { Tab, Tabs, Button, Alert, Collapse, Tooltip, OverlayTrigger } from 'react-bootstrap';
+
 
 export default class UserQueue extends React.Component {
 
@@ -16,7 +17,9 @@ export default class UserQueue extends React.Component {
       uid: props.match.params.uid,
       user: {name: ''},
       tasks: [],
-      showComplete: false
+      showComplete: false,
+      buttonShow: true,
+      open: false,
     };
     firebase.database().ref(`queues`).child(props.match.params.uid).child('tasks').on('value', snapshot => {
             let taskArray = [];
@@ -46,10 +49,10 @@ export default class UserQueue extends React.Component {
   }
 
   completeTask(task){
-    if (userStore.uid == this.state.uid){
+    if (userStore.uid === this.state.uid){
       console.log('completing');
       firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).child('isComplete').set(true);
-    } else if (userStore.uid == task.fromuser.uid){
+    } else if (userStore.uid === task.fromuser.uid){
       console.log("deleting");
       firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).remove();
     } else {
@@ -58,10 +61,10 @@ export default class UserQueue extends React.Component {
   }
 
   unCompleteTask(task){
-    if (userStore.uid == this.state.uid){
+    if (userStore.uid === this.state.uid){
       console.log('uncompleting');
       firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).child('isComplete').set(false);
-    } else if (userStore.uid == task.fromuser.uid){
+    } else if (userStore.uid === task.fromuser.uid){
       console.log("deleting");
       firebase.database().ref('queues').child(this.state.uid).child('tasks').child(task.key).remove();
     } else {
@@ -90,32 +93,85 @@ export default class UserQueue extends React.Component {
   }
 
   handleKeyUp(evt){
-    if (evt.key == "Enter"){
-      console.log(this.refs.newTask.value);
-      this.pushTask(this.refs.newTask.value);
+    if (evt.key === "Enter") {
+      if (this.refs.newTask.value === "") {
+
+      }
+      else {
+        console.log(this.refs.newTask.value);
+        this.pushTask(this.refs.newTask.value);
+      }
+    }
+  }
+  
+  handleFirstClick() {
+    this.setState({buttonShow: false});
+  }
+
+  handleSecondClick() {
+    this.setState({buttonShow: true, open: true});
+    var i;
+    for (i = 0; i < this.state.tasks.length; i++) {
+      if (this.state.tasks[i].isComplete) {
+        firebase.database().ref('queues').child(this.state.uid).child('tasks').child(this.state.tasks[i].key).remove();
+      }
     }
   }
 
   handleButtonClick() {
-    this.pushTask(this.refs.newTask.value);
+    if (this.refs.newTask.value === "") {
+
+    }
+    else {
+      console.log(this.refs.newTask.value);
+      this.pushTask(this.refs.newTask.value);
+    }
+  }
+  
+  renderClearButton() {
+    if (this.state.uid === userStore.uid) {
+      if (this.state.buttonShow) {
+        return (
+          <Button onClick={this.handleFirstClick.bind(this)} style={{marginLeft: '10px'}} bsStyle="danger">Clear completed tasks</Button>
+        );
+      }
+      else {
+        return (
+          <Button onClick={this.handleSecondClick.bind(this)} style={{marginLeft: '10px'}} bsStyle="danger">Are you sure?</Button>
+        );
+      }
+    }
   }
 
   render() {
-
     return (
       <div className="App">
+            <Collapse onEntered={() => setTimeout(() => this.setState({open: false}), 2000) } style={{position: 'absolute', width: '100%', marginTop: '1em', paddingRight: '1em'}} in={this.state.open}>
+              <div>
+                <Alert style={{marginBottom: 0, width: '30%', float: 'right'}} bsStyle="warning">
+                  <strong>Completed tasks were cleared.</strong>
+                </Alert>
+              </div>
+            </Collapse>
           <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
-              <div className="App-title">{!!this.state.user && <span>{this.state.user.name}</span>}'s Tasks</div>
+          <OverlayTrigger placement="right" overlay={
+            <Tooltip id="tooltip">
+              Go back to the members page.
+            </Tooltip>}
+          >
+            <a href="/"><img src={logo} className="App-logo" alt="logo"/></a>
+          </OverlayTrigger>
+            <div className="App-title">{!!this.state.user && <span>{this.state.user.name}</span>}'s Tasks</div>
           </header>
           <div>
-        {userStore.authed &&
-        <div>
-          <label style={{marginTop: '20px', fontSize: '1.25em'}}>
-            <input style={{marginLeft: '10px', marginRight:'10px'}} type="text" onKeyUp={this.handleKeyUp.bind(this)} ref={'newTask'} placeholder={'Add task to queue...'}/>
-            <Button onClick={this.handleButtonClick.bind(this)} style={{fontSize: '1em'}} bsStyle='success'>Submit</Button>
-          </label>
-        </div>}
+            {userStore.authed &&
+            <div>
+              <label style={{marginTop: '20px', fontSize: '1.25em'}}>
+                <input style={{marginLeft: '10px', marginRight:'10px', paddingLeft: '10px'}} type="text" onKeyUp={this.handleKeyUp.bind(this)} ref={'newTask'} placeholder={'Add task to queue...'}/>
+                <Button onClick={this.handleButtonClick.bind(this)} style={{fontSize: '1em'}} bsStyle='success'>Submit</Button>
+                {this.renderClearButton()}
+              </label>
+            </div>}
         {!userStore.authed &&
         <div>Login to post tasks to this user</div>
         }
@@ -127,16 +183,13 @@ export default class UserQueue extends React.Component {
             }).map(task=>{
               var icon;
               if (this.state.showComplete){
-                if (userStore.uid == this.state.uid) {
-                  icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
-                }
               return (<li key={task.key}>
                 <strong>{task.fromuser.name} ({new Date(task.timestamp).toLocaleString()}):</strong>
                 &nbsp;<span className={'task-value'}>{task.task}</span>&nbsp;
                 {icon}
                 </li>)
             } else {
-              if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
+              if ((userStore.uid === this.state.uid) || (userStore.uid === task.fromuser.uid)) {
                 return (
                   <TaskCard completeMethod={this.completeTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
@@ -148,20 +201,17 @@ export default class UserQueue extends React.Component {
               }
             }})}
           </Tab>
+          
           <Tab eventKey={2} title="Complete">
             {this.state.tasks.filter(task=>{
                 return task.isComplete;
             }).map(task=>{
-              var icon;
               if (this.state.showComplete){
-                if (userStore.uid == this.state.uid) {
-                  icon = <span onClick={this.unCompleteTask.bind(this, task)}><strong>✓</strong></span>;
-                }
               return (
                 <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
               );
             } else {
-              if ((userStore.uid == this.state.uid) || (userStore.uid == task.fromuser.uid)) {
+              if ((userStore.uid === this.state.uid) || (userStore.uid === task.fromuser.uid)) {
                 return (
                   <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
@@ -176,6 +226,7 @@ export default class UserQueue extends React.Component {
         </Tabs>
         <br></br>
       </div>
+
       </div>
     );
   }
