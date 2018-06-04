@@ -41,6 +41,11 @@ export default class UserQueue extends React.Component {
             this.setState({
                 tasks: taskArray
             });
+
+            // Order the list from earlier dates to later dates
+            this.setState({tasks: this.state.tasks.sort(function(a, b) {
+              return a.timestamp - b.timestamp;
+            })})
         });
   }
 
@@ -144,6 +149,11 @@ export default class UserQueue extends React.Component {
   }
 
   render() {
+    
+    let completeArray = this.state.tasks.filter(task=>{
+      return task.isComplete;
+    }).reverse();
+
     return (
       <div className="App">
             <Collapse onEntered={() => setTimeout(() => this.setState({open: false}), 2000) } style={{position: 'absolute', width: '100%', marginTop: '1em', paddingRight: '1em'}} in={this.state.open}>
@@ -180,7 +190,7 @@ export default class UserQueue extends React.Component {
           <Tab eventKey={1} title="Pending">
             {this.state.tasks.filter(task=>{
                 return !task.isComplete;
-            }).map(task=>{
+            }).map(task => {
               var icon;
               if (this.state.showComplete){
               return (<li key={task.key}>
@@ -203,9 +213,7 @@ export default class UserQueue extends React.Component {
           </Tab>
           
           <Tab eventKey={2} title="Complete">
-            {this.state.tasks.filter(task=>{
-                return task.isComplete;
-            }).map(task=>{
+            {completeArray.map(task=>{
               if (this.state.showComplete){
               return (
                 <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
