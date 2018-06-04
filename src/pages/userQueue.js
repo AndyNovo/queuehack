@@ -185,7 +185,7 @@ export default class UserQueue extends React.Component {
         {!userStore.authed &&
         <div>Login to post tasks to this user</div>
         }
-        <p>Hint: You can 'uncomplete' tasks by clicking the 'X' in the completed tab.</p>
+        <p>Hint: You can go back to the main page by clicking the golden egg.</p>
         <Tabs defaultActiveKey={1} id="uncontrolled-tab-example">
           <Tab eventKey={1} title="Pending">
             {this.state.tasks.filter(task=>{
