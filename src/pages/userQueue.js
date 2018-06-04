@@ -149,7 +149,7 @@ export default class UserQueue extends React.Component {
   }
 
   render() {
-    
+
     let completeArray = this.state.tasks.filter(task=>{
       return task.isComplete;
     }).reverse();
@@ -201,12 +201,12 @@ export default class UserQueue extends React.Component {
             } else {
               if ((userStore.uid === this.state.uid) || (userStore.uid === task.fromuser.uid)) {
                 return (
-                  <TaskCard completeMethod={this.completeTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                  <TaskCard completeMethod={this.completeTask.bind(this, task)} fromUser={task.fromuser} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
               }
               else {
                 return (
-                  <TaskCard completeMethod={false} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                  <TaskCard completeMethod={false} fromUser={task.fromuser} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
               }
             }})}
@@ -216,17 +216,17 @@ export default class UserQueue extends React.Component {
             {completeArray.map(task=>{
               if (this.state.showComplete){
               return (
-                <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
               );
             } else {
               if ((userStore.uid === this.state.uid) || (userStore.uid === task.fromuser.uid)) {
                 return (
-                  <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                  <TaskCard completeMethod={this.unCompleteTask.bind(this, task)} fromUser={task.fromuser} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
               }
               else {
                 return (
-                  <TaskCard completeMethod={false} fromUser={task.fromuser.name} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
+                  <TaskCard completeMethod={false} fromUser={task.fromuser} date={task.timestamp} taskContent={task.task} isComplete={task.isComplete.toString()}/>
                 );
               }
             }})}

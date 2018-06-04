@@ -24,7 +24,7 @@ export class TaskCard extends React.Component {
             <Panel className="container" bsStyle="warning" expanded={this.state.expanded}>
             <Panel.Heading>
                 <Panel.Title>
-                {this.props.fromUser} | {this.formatDate(this.props.date)}
+                <a href={"/user/" + this.props.fromUser.uid}>{this.props.fromUser.name}</a> | {this.formatDate(this.props.date)}
                 <div style={{float: 'right'}}>
                     {this.state.expanded ? <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>↓&nbsp;&nbsp;&nbsp;&nbsp;</div> : <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>+&nbsp;&nbsp;&nbsp;&nbsp;</div>}
                 </div>
@@ -43,7 +43,7 @@ export class TaskCard extends React.Component {
             <Panel className="container" bsStyle="warning" expanded={this.state.expanded}>
             <Panel.Heading>
                 <Panel.Title>
-                {this.props.fromUser} | {this.formatDate(this.props.date)}
+                <a href={"/user/" + this.props.fromUser.uid}>{this.props.fromUser.name}</a> | {this.formatDate(this.props.date)}
                 <div style={{float: 'right'}}>
                 {this.state.expanded ? <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>↓&nbsp;&nbsp;&nbsp;&nbsp;</div> : <div onClick={this.handleCollapse.bind(this)} style={{display: 'inline-block', textDecoration: 'none', color: '#8a6d3b', cursor: 'pointer'}}>+&nbsp;&nbsp;&nbsp;&nbsp;</div>}
                     <div onClick={this.props.completeMethod} style={{ display: 'inline-block', cursor: 'pointer'}}>✕</div>
